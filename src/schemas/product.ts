@@ -25,7 +25,7 @@ export const ProductSchema = z.object({
   rating: z.number(),
   stock: z.number(),
   tags: z.array(z.string()),
-  brand: z.string(),
+  brand: z.string().optional(),
   sku: z.string(),
   weight: z.number(),
   dimensions: DimensionsSchema,
