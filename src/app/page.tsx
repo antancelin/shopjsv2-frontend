@@ -23,7 +23,7 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/products">
-            <Button size="lg" className="text-lg px-8">
+            <Button size="lg" className="text-lg px-8 cursor-pointer">
               <ShoppingBag className="mr-2 h-5 w-5" />
               Découvrir nos produits
             </Button>
@@ -97,7 +97,9 @@ export default function HomePage() {
           façon de faire du shopping.
         </p>
         <Link href="/products">
-          <Button size="lg">Commencer mes achats</Button>
+          <Button size="lg" className="cursor-pointer">
+            Commencer mes achats
+          </Button>
         </Link>
       </section>
     </div>
