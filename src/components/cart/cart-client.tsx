@@ -201,14 +201,12 @@ export default function CartClient() {
                       if (isAuthenticated) {
                         router.push("/payment");
                       } else {
-                        router.push("/users/login");
+                        router.push("/users/login?redirect=/cart");
                       }
                     }}
                   >
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    {isAuthenticated
-                      ? "Passer la commande"
-                      : "Se connecter pour commander"}
+                    {isAuthenticated ? "Passer la commande" : "Se connecter"}
                   </Button>
 
                   <Link href="/products">

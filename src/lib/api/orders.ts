@@ -22,6 +22,9 @@ export async function createOrder(
 
   return authenticatedRequest<{ message: string }>("/orders", token, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(validatedData),
   });
 }
