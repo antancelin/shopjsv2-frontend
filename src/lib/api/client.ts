@@ -31,7 +31,7 @@ export async function apiRequest<T>(
   }
 
   // log cache info in development
-  if (true) {
+  if (process.env.NODE_ENV === "development") {
     const cacheInfo = cacheOptions?.revalidate
       ? `Cache: ${cacheOptions.revalidate}s`
       : "No cache";

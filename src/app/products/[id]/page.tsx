@@ -1,3 +1,6 @@
+export const revalidate = 180;
+export const dynamic = "force-static";
+
 import { getProductById } from "@/lib/api/products";
 import { notFound } from "next/navigation";
 import Image from "next/image";
