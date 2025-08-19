@@ -15,6 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserPlus, Loader2 } from "lucide-react";
+import { SignupSchema } from "@/schemas/user";
+import { z } from "zod";
 
 interface SignupState {
   error?: string;
@@ -35,8 +37,19 @@ export default function SignupPage() {
     const password = formData.get("password") as string;
 
     try {
+      SignupSchema.parse({ username, email, password });
+    } catch (zodError) {
+      if (zodError instanceof z.ZodError) {
+        const firstError = zodError.issues[0];
+        return {
+          error: firstError.message,
+        };
+      }
+    }
+
+    try {
       await signup(username, email, password);
-      // redirection after successful signup
+      // redirect after successful signup
       router.push("/");
       return { success: true };
     } catch (error: unknown) {
@@ -63,7 +76,7 @@ export default function SignupPage() {
               Créer un compte
             </CardTitle>
             <CardDescription className="text-center">
-              Rejoignez ShopJS v2 pour commencer vos achats
+              Rejoignez ShopJS pour commencer vos achats
             </CardDescription>
           </CardHeader>
 

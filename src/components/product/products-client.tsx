@@ -31,9 +31,9 @@ export default function ProductsClient({
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <SearchBar onSearch={handleSearch} />
       <ProductList products={filteredProducts} />
-    </>
+    </div>
   );
 }

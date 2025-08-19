@@ -13,6 +13,8 @@ import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createOrder } from "@/lib/api/orders";
 import { CartItem, CartState } from "@/types/cart";
+import { PaymentSchema } from "@/schemas/payment";
+import { z } from "zod";
 
 // type for the form state
 interface FormState {
@@ -39,46 +41,24 @@ async function createOrderAction(
   const cartRaw = formData.get("cart") as string;
   const cartData = cartRaw ? (JSON.parse(cartRaw) as CartState) : undefined;
 
-  if (!firstName || firstName.trim().length < 2) {
-    return {
-      success: false,
-      error: "Le prénom doit contenir au moins 2 caractères",
-    };
-  }
-
-  if (!lastName || lastName.trim().length < 2) {
-    return {
-      success: false,
-      error: "Le nom doit contenir au moins 2 caractères",
-    };
-  }
-
-  if (!address1 || address1.trim().length < 5) {
-    return {
-      success: false,
-      error: "L'adresse doit contenir au moins 5 caractères",
-    };
-  }
-
-  if (!postalCode || !/^[0-9]{5}$/.test(postalCode)) {
-    return {
-      success: false,
-      error: "Le code postal doit contenir 5 chiffres",
-    };
-  }
-
-  if (!city || city.trim().length < 2) {
-    return {
-      success: false,
-      error: "La ville doit contenir au moins 2 caractères",
-    };
-  }
-
-  if (!phone || !/^[0-9\s\-\+\.]{10,}$/.test(phone)) {
-    return {
-      success: false,
-      error: "Le numéro de téléphone n'est pas valide",
-    };
+  try {
+    PaymentSchema.parse({
+      firstName,
+      lastName,
+      address1,
+      address2,
+      postalCode,
+      city,
+      phone,
+    });
+  } catch (zodError) {
+    if (zodError instanceof z.ZodError) {
+      const firstError = zodError.issues[0];
+      return {
+        success: false,
+        error: firstError.message,
+      };
+    }
   }
 
   if (!token) {

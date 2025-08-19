@@ -30,8 +30,29 @@ export async function apiRequest<T>(
     nextConfig = { cache: "no-store" };
   }
 
+  async function fetchWithRetry(
+    url: string,
+    options: RequestInit,
+    retries = 2
+  ): Promise<Response> {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status >= 500 && i < retries) {
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+          continue;
+        }
+        return response;
+      } catch (error) {
+        if (i === retries) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+    throw new Error("Impossible de contacter le serveur");
+  }
+
   // build response
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetchWithRetry(`${API_BASE_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
@@ -44,14 +65,71 @@ export async function apiRequest<T>(
   if (!response.ok) {
     // unify error response
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API Error: ${response.status}`);
+
+    // Messages spécifiques par code d'erreur + endpoint
+    let message = "";
+
+    switch (response.status) {
+      case 400:
+        if (endpoint.includes("/user/signup")) {
+          message = "Veuillez remplir tous les champs requis";
+        } else if (endpoint.includes("/orders")) {
+          message = "Données de commande invalides";
+        } else {
+          message = "Données invalides";
+        }
+        break;
+
+      case 401:
+        if (endpoint.includes("/user/login")) {
+          message = "Email ou mot de passe incorrect";
+        } else {
+          message = "Session expirée, veuillez vous reconnecter";
+        }
+        break;
+
+      case 403:
+        message = "Accès refusé - droits administrateur requis";
+        break;
+
+      case 404:
+        if (endpoint.includes("/products/")) {
+          message = "Ce produit n'existe pas ou a été supprimé";
+        } else {
+          message = "Page ou ressource non trouvée";
+        }
+        break;
+
+      case 409:
+        message = "Cette adresse email est déjà utilisée";
+        break;
+
+      case 500:
+        message =
+          "Erreur serveur temporaire - veuillez réessayer dans quelques instants";
+        break;
+
+      default:
+        message =
+          errorData.message ||
+          `Erreur ${response.status} - ${response.statusText}`;
+    }
+
+    throw new Error(message);
   }
 
   const data = await response.json();
 
   // auto zod validation if schema is provided
   if (schema) {
-    return schema.parse(data);
+    try {
+      return schema.parse(data);
+    } catch (zodError) {
+      console.error("Zod validation error:", zodError);
+      throw new Error(
+        "Données reçues du serveur invalides - veuillez réessayer"
+      );
+    }
   }
 
   // return data

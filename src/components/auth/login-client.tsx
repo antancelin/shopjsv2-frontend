@@ -15,6 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LogIn, Loader2 } from "lucide-react";
+import { LoginSchema } from "@/schemas/user";
+import { z } from "zod";
 
 interface LoginState {
   error?: string;
@@ -29,7 +31,7 @@ export default function LoginClient({ redirect }: LoginClientProps) {
   const { login } = useAuth();
   const router = useRouter();
 
-  // Action pour gérer la connexion
+  // action to manage login
   const loginAction = async (
     prevState: LoginState,
     formData: FormData
@@ -38,8 +40,19 @@ export default function LoginClient({ redirect }: LoginClientProps) {
     const password = formData.get("password") as string;
 
     try {
+      LoginSchema.parse({ email, password });
+    } catch (zodError) {
+      if (zodError instanceof z.ZodError) {
+        const firstError = zodError.issues[0];
+        return {
+          error: firstError.message,
+        };
+      }
+    }
+
+    try {
       await login(email, password);
-      // Redirection vers redirect ou vers "/" par défaut
+      // redirect to redirect or "/" by default
       router.push(redirect || "/");
       return { success: true };
     } catch (error) {

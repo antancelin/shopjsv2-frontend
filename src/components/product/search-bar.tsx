@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
+import { SearchSchema } from "@/schemas/search";
+import { z } from "zod";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -17,10 +19,29 @@ export default function SearchBar({
   className = "",
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(query.trim());
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    setError("");
+
+    // real time search with simple debounce
+    const trimmedQuery = newQuery.trim();
+
+    if (trimmedQuery === "") {
+      onSearch("");
+      return;
+    }
+
+    try {
+      SearchSchema.parse({ query: trimmedQuery });
+      onSearch(trimmedQuery);
+    } catch (zodError) {
+      if (zodError instanceof z.ZodError) {
+        setError(zodError.issues[0].message);
+      }
+    }
   };
 
   const handleClear = () => {
@@ -28,12 +49,8 @@ export default function SearchBar({
     onSearch("");
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
 
@@ -58,14 +75,7 @@ export default function SearchBar({
         )}
       </div>
 
-      {/* Bouton de recherche mobile (optionnel) */}
-      <Button
-        type="submit"
-        className="ml-2 hidden sm:inline-flex"
-        disabled={!query.trim()}
-      >
-        Rechercher
-      </Button>
-    </form>
+      {error && <p className="text-xs text-destructive mt-1">{error}</p>}
+    </div>
   );
 }

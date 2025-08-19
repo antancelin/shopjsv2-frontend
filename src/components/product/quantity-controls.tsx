@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Minus, Plus } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { Product } from "@/schemas/product";
+import { QuantitySchema } from "@/schemas/quantity";
+import { z } from "zod";
+import { useState } from "react";
 
 interface QuantityControlsProps {
   product: Product;
@@ -18,11 +21,22 @@ export default function QuantityControls({
   className = "",
 }: QuantityControlsProps) {
   const { addItem, decreaseQuantity, getItemQuantity } = useCart();
+  const [error, setError] = useState("");
 
   const quantity = getItemQuantity(product._id);
 
   const handleIncrease = () => {
-    addItem(product);
+    const newQuantity = quantity + 1;
+
+    try {
+      QuantitySchema.parse({ quantity: newQuantity });
+      addItem(product);
+      setError("");
+    } catch (zodError) {
+      if (zodError instanceof z.ZodError) {
+        setError(zodError.issues[0].message);
+      }
+    }
   };
 
   const handleDecrease = () => {
@@ -31,23 +45,27 @@ export default function QuantityControls({
 
   if (variant === "compact") {
     return (
-      <div className={`flex items-center space-x-2 ${className}`}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleDecrease}
-          disabled={quantity === 0}
-        >
-          <Minus className="h-3 w-3" />
-        </Button>
+      <div className={`${className}`}>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDecrease}
+            disabled={quantity === 0}
+          >
+            <Minus className="h-3 w-3" />
+          </Button>
 
-        <Badge variant="secondary" className="min-w-[2rem] text-center">
-          {quantity}
-        </Badge>
+          <Badge variant="secondary" className="min-w-[2rem] text-center">
+            {quantity}
+          </Badge>
 
-        <Button variant="outline" size="sm" onClick={handleIncrease}>
-          <Plus className="h-3 w-3" />
-        </Button>
+          <Button variant="outline" size="sm" onClick={handleIncrease}>
+            <Plus className="h-3 w-3" />
+          </Button>
+        </div>
+
+        {error && <p className="text-xs text-destructive mt-1">{error}</p>}
       </div>
     );
   }
@@ -73,6 +91,10 @@ export default function QuantityControls({
       <Button variant="outline" size="icon" onClick={handleIncrease}>
         <Plus className="h-4 w-4" />
       </Button>
+
+      {error && (
+        <p className="text-xs text-destructive mt-1 text-center">{error}</p>
+      )}
     </div>
   );
 }
