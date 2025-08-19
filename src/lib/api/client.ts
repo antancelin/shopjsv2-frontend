@@ -30,6 +30,15 @@ export async function apiRequest<T>(
     nextConfig = { cache: "no-store" };
   }
 
+  // log cache info in development
+  if (true) {
+    const cacheInfo = cacheOptions?.revalidate
+      ? `Cache: ${cacheOptions.revalidate}s`
+      : "No cache";
+    console.log(`🌐 API ${options.method || "GET"} ${endpoint} - ${cacheInfo}`);
+    console.log(`⏰ ${new Date().toLocaleTimeString()}`);
+  }
+
   async function fetchWithRetry(
     url: string,
     options: RequestInit,
@@ -53,12 +62,12 @@ export async function apiRequest<T>(
 
   // build response
   const response = await fetchWithRetry(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    ...nextConfig,
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
     },
-    ...nextConfig,
-    ...options,
   });
 
   // check if response is ok
@@ -66,7 +75,7 @@ export async function apiRequest<T>(
     // unify error response
     const errorData = await response.json().catch(() => ({}));
 
-    // Messages spécifiques par code d'erreur + endpoint
+    // specific error messages by status code + endpoint
     let message = "";
 
     switch (response.status) {

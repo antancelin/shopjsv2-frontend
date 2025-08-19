@@ -52,6 +52,7 @@ export default function QuantityControls({
             size="sm"
             onClick={handleDecrease}
             disabled={quantity === 0}
+            className="cursor-pointer"
           >
             <Minus className="h-3 w-3" />
           </Button>
@@ -60,7 +61,12 @@ export default function QuantityControls({
             {quantity}
           </Badge>
 
-          <Button variant="outline" size="sm" onClick={handleIncrease}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleIncrease}
+            className="cursor-pointer"
+          >
             <Plus className="h-3 w-3" />
           </Button>
         </div>
@@ -77,6 +83,7 @@ export default function QuantityControls({
         size="icon"
         onClick={handleDecrease}
         disabled={quantity === 0}
+        className="cursor-pointer"
       >
         <Minus className="h-4 w-4" />
       </Button>
@@ -88,7 +95,12 @@ export default function QuantityControls({
         </Badge>
       </div>
 
-      <Button variant="outline" size="icon" onClick={handleIncrease}>
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={handleIncrease}
+        className="cursor-pointer"
+      >
         <Plus className="h-4 w-4" />
       </Button>
 

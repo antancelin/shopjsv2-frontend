@@ -15,7 +15,7 @@ export default function CartClient() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  // Panier vide
+  // empty cart
   if (state.items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -41,7 +41,6 @@ export default function CartClient() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Mon Panier</h1>
@@ -61,15 +60,12 @@ export default function CartClient() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Liste des produits */}
           <div className="lg:col-span-2 space-y-4">
             {state.items.map((item) => (
               <Card key={item.product._id}>
                 <CardContent className="p-4">
                   <div className="flex flex-col sm:grid sm:grid-cols-[80px_1fr_120px_80px_40px] sm:gap-4 sm:items-center gap-4">
-                    {/* Mobile: structure actuelle */}
                     <div className="flex items-start gap-3 sm:contents">
-                      {/* Image */}
                       <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
                         <Image
                           src={item.product.thumbnail}
@@ -79,7 +75,6 @@ export default function CartClient() {
                         />
                       </div>
 
-                      {/* Infos - limitées sur desktop avec sm:contents */}
                       <div className="flex-1 min-w-0 sm:min-w-0">
                         <Link
                           href={`/products/${item.product._id}`}
@@ -107,7 +102,6 @@ export default function CartClient() {
                       </div>
                     </div>
 
-                    {/* Contrôles - séparés sur desktop */}
                     <div className="flex items-center justify-between sm:contents">
                       <div className="flex items-center gap-3 sm:gap-2 sm:justify-center">
                         <Button
@@ -140,14 +134,12 @@ export default function CartClient() {
                         </Button>
                       </div>
 
-                      {/* Prix total */}
                       <div className="text-right">
                         <p className="font-bold text-base sm:text-lg">
                           {(item.product.price * item.quantity).toFixed(2)}€
                         </p>
                       </div>
 
-                      {/* Supprimer */}
                       <div className="flex justify-center">
                         <Button
                           variant="outline"
@@ -165,7 +157,6 @@ export default function CartClient() {
             ))}
           </div>
 
-          {/* Résumé de commande */}
           <div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardHeader>

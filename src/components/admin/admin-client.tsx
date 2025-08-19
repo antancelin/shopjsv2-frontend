@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/auth-context";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getOrders, markOrderAsDelivered } from "@/lib/api/orders";
+import { markOrderAsDelivered } from "@/lib/api/orders";
 import { Order } from "@/schemas/order";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,14 +11,16 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Package, CheckCircle, Clock, User } from "lucide-react";
 
 export default function AdminClient() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Vérification admin
+  // admin check (redirect if not admin)
   useEffect(() => {
+    if (isLoading) return;
+
     if (!isAuthenticated) {
       router.push("/users/login");
       return;
@@ -28,16 +30,20 @@ export default function AdminClient() {
       router.push("/");
       return;
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, isLoading]);
 
-  // Charger les commandes
+  // fetch orders (with cache)
   useEffect(() => {
     const fetchOrders = async () => {
       if (!user?.token || !user?.admin) return;
 
       try {
         setLoading(true);
-        const ordersData = await getOrders(user.token);
+        const res = await fetch(
+          `/api/admin/orders?token=${encodeURIComponent(user.token)}`
+        );
+        if (!res.ok) throw new Error("Erreur lors du chargement");
+        const ordersData: Order[] = await res.json();
         setOrders(ordersData);
       } catch (err) {
         setError(
@@ -51,13 +57,12 @@ export default function AdminClient() {
     fetchOrders();
   }, [user]);
 
-  // Marquer comme livrée
+  // mark as delivered (update locally)
   const handleMarkDelivered = async (orderId: string) => {
     if (!user?.token) return;
 
     try {
       await markOrderAsDelivered(orderId, user.token);
-      // Mettre à jour localement
       setOrders((prev) =>
         prev.map((order) =>
           order._id === orderId ? { ...order, delivered: true } : order
@@ -70,10 +75,12 @@ export default function AdminClient() {
     }
   };
 
+  // loading
   if (!isAuthenticated || !user?.admin) {
     return <div>Chargement...</div>;
   }
 
+  // loading
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -85,7 +92,6 @@ export default function AdminClient() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Shield className="h-8 w-8 text-amber-600" />
           <div>
@@ -103,7 +109,6 @@ export default function AdminClient() {
           </div>
         )}
 
-        {/* Liste des commandes */}
         <div className="space-y-4">
           {orders.length === 0 ? (
             <Card>
@@ -150,7 +155,6 @@ export default function AdminClient() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                  {/* Infos client */}
                   <div className="flex items-start gap-3">
                     <User className="h-4 w-4 mt-1 text-muted-foreground" />
                     <div className="flex-1">
@@ -161,7 +165,6 @@ export default function AdminClient() {
                     </div>
                   </div>
 
-                  {/* Produits */}
                   <div>
                     <p className="font-medium mb-2">Produits commandés :</p>
                     <div className="space-y-2">
@@ -179,7 +182,6 @@ export default function AdminClient() {
                     </div>
                   </div>
 
-                  {/* Bouton action */}
                   {!order.delivered && (
                     <div className="pt-2">
                       <Button

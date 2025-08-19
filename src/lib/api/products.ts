@@ -12,7 +12,11 @@ export async function getProducts(search?: string): Promise<Product[]> {
     ? `/products?search=${encodeURIComponent(search)}`
     : "/products";
 
-  return apiGet<Product[]>(endpoint, ProductsSchema, 3);
+  if (search) {
+    return apiGetNoCache<Product[]>(endpoint, ProductsSchema);
+  } else {
+    return apiGet<Product[]>(endpoint, ProductsSchema);
+  }
 }
 
 /**

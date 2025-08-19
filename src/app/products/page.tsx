@@ -1,13 +1,11 @@
+export const revalidate = 180;
+export const dynamic = "force-static";
+
 import { getProducts } from "@/lib/api/products";
 import ProductsClient from "@/components/product/products-client";
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: { search?: string };
-}) {
-  const params = await searchParams;
-  const initialProducts = await getProducts(params.search);
+export default async function ProductsPage() {
+  const initialProducts = await getProducts();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -18,7 +16,6 @@ export default async function ProductsPage({
         </p>
       </div>
 
-      {/* Client Component pour l'interactivité */}
       <ProductsClient initialProducts={initialProducts} />
     </div>
   );

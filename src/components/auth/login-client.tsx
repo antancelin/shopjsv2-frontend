@@ -118,7 +118,11 @@ export default function LoginClient({ redirect }: LoginClientProps) {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isPending}>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={isPending}
+              >
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

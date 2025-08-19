@@ -9,7 +9,7 @@ import { ArrowLeft, Star } from "lucide-react";
 import QuantityControls from "@/components/product/quantity-controls";
 
 interface ProductPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -18,16 +18,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   try {
     const product = await getProductById(id);
 
-    // Calcul prix avec remise
+    // calculate discounted price
     const discountedPrice =
       product.price * (1 - product.discountPercentage / 100);
 
     return (
       <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
         <div className="mb-6">
           <Link href="/products">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="cursor-pointer">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour aux produits
             </Button>
@@ -35,7 +34,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Images */}
           <div className="space-y-4">
             <div className="aspect-square relative">
               <Image
@@ -52,7 +50,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               )}
             </div>
 
-            {/* Gallery miniatures */}
             <div className="grid grid-cols-4 gap-2">
               {product.images.slice(0, 4).map((image, index) => (
                 <div key={index} className="aspect-square relative">
@@ -67,14 +64,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
 
-          {/* Infos produit */}
           <div className="space-y-6">
             <div>
               <p className="text-sm text-muted-foreground">{product.brand}</p>
               <h1 className="text-3xl font-bold">{product.title}</h1>
             </div>
 
-            {/* Prix */}
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <span className="text-2xl font-bold">
@@ -88,7 +83,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
 
-            {/* Rating */}
             <div className="flex items-center space-x-2">
               <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
               <span className="font-medium">{product.rating.toFixed(1)}</span>
@@ -97,13 +91,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </span>
             </div>
 
-            {/* Description */}
             <div>
               <h3 className="font-semibold mb-2">Description</h3>
               <p className="text-muted-foreground">{product.description}</p>
             </div>
 
-            {/* Stock */}
             <div>
               {product.stock > 0 ? (
                 <Badge variant="secondary">{product.stock} en stock</Badge>
@@ -112,12 +104,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
               )}
             </div>
 
-            {/* Contrôles quantité */}
             <div className="py-4">
               <QuantityControls product={product} />
             </div>
 
-            {/* Infos supplémentaires */}
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>• {product.warrantyInformation}</p>
               <p>• {product.shippingInformation}</p>
@@ -126,7 +116,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </div>
 
-        {/* Reviews */}
+        {/* reviews */}
         {product.reviews.length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold mb-6">Avis clients</h2>

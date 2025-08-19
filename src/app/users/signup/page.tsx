@@ -27,7 +27,7 @@ export default function SignupPage() {
   const { signup } = useAuth();
   const router = useRouter();
 
-  // action to manage signup
+  // action to manage signup (form)
   const signupAction = async (
     prevState: SignupState,
     formData: FormData
@@ -49,7 +49,7 @@ export default function SignupPage() {
 
     try {
       await signup(username, email, password);
-      // redirect after successful signup
+      // redirect after successful signup (home)
       router.push("/");
       return { success: true };
     } catch (error: unknown) {
@@ -129,7 +129,11 @@ export default function SignupPage() {
                 </p>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isPending}>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={isPending}
+              >
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
