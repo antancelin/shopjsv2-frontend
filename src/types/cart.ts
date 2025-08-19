@@ -22,7 +22,8 @@ export type CartAction =
       payload: { productId: string; quantity: number };
     }
   | { type: "DECREASE_QUANTITY"; payload: string } // productId
-  | { type: "CLEAR_CART" };
+  | { type: "CLEAR_CART" }
+  | { type: "RESTORE_CART"; payload: CartState };
 
 // context type (state + actions)
 export interface CartContextType {

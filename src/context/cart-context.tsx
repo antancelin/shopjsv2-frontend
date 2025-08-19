@@ -6,6 +6,7 @@ import React, {
   useContext,
   useCallback,
 } from "react";
+import { useEffect } from "react";
 import {
   CartState,
   CartAction,
@@ -100,6 +101,10 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       };
     }
 
+    case "RESTORE_CART": {
+      return action.payload;
+    }
+
     case "CLEAR_CART": {
       return initialCartState;
     }
@@ -117,6 +122,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
+
+  // load cart from local storage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("shopjs-cart");
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart);
+          dispatch({ type: "RESTORE_CART", payload: parsedCart });
+        } catch (error) {
+          console.error("Erreur lors de la restauration du panier:", error);
+        }
+      }
+    }
+  }, []);
+
+  // save cart to local storage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("shopjs-cart", JSON.stringify(state));
+    }
+  }, [state]);
 
   // helper functions
   const addItem = useCallback((product: Product) => {
