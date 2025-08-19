@@ -15,7 +15,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="text-center py-12">
         <h1 className="text-4xl md:text-6xl font-bold mb-6">
-          Bienvenue sur <span className="text-primary">ShopJS v2</span>
+          Bienvenue sur <span className="text-primary">ShopJS</span>
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
           Découvrez notre sélection de produits de qualité avec une expérience
@@ -28,18 +28,13 @@ export default function HomePage() {
               Découvrir nos produits
             </Button>
           </Link>
-          <Link href="/users/signup">
-            <Button variant="outline" size="lg" className="text-lg px-8">
-              Créer un compte
-            </Button>
-          </Link>
         </div>
       </section>
 
       {/* Features Section */}
       <section className="py-12">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Pourquoi choisir ShopJS v2 ?
+          Pourquoi choisir ShopJS ?
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
