@@ -36,7 +36,7 @@ export async function createOrder(
  * cache: 1min
  */
 export async function getOrders(token: string): Promise<Order[]> {
-  return adminRequest<Order[]>(
+  return await adminRequest<Order[]>(
     "/orders",
     token,
     { method: "GET" },

@@ -1,14 +1,20 @@
 import { z } from "zod";
-import { UserSchema } from "./user";
 
 const OrderProductSchema = z.object({
   product: z.string(), // objectId as string
   quantity: z.number().min(1, "Quantity must be at least 1"),
 });
 
+const PopulatedOwnerSchema = z.object({
+  _id: z.string(),
+  username: z.string().optional(),
+  email: z.string().optional(),
+  admin: z.boolean().optional(),
+});
+
 export const OrderSchema = z.object({
   _id: z.string(),
-  owner: UserSchema,
+  owner: PopulatedOwnerSchema,
   products: z.array(OrderProductSchema),
   price: z.number(),
   delivered: z.boolean(),
